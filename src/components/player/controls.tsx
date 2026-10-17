@@ -1,8 +1,8 @@
 "use client";
 
 import { Loader2, Pause, Play, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Volume1, Volume2, VolumeX } from "lucide-react";
-import type { CSSProperties } from "react";
-import { usePlayer } from "@/components/player/player-provider";
+import { useState, type CSSProperties } from "react";
+import { usePlayer, usePlayerTime } from "@/components/player/player-provider";
 import { cn } from "@/lib/utils";
 
 export function fmtTime(s: number) {
@@ -77,21 +77,37 @@ export function TransportControls({ size = "md", className }: { size?: "md" | "l
 
 export function ProgressBar({ className, large }: { className?: string; large?: boolean }) {
   const p = usePlayer();
+  const { currentTime, duration, buffered } = usePlayerTime();
+  // While dragging, only move the thumb; seek once on release so a slow
+  // network isn't flooded with a request per pixel.
+  const [drag, setDrag] = useState<number | null>(null);
   const canPlay = Boolean(p.track?.preview_url);
-  const pct = p.duration ? (p.currentTime / p.duration) * 100 : 0;
+  const shown = drag ?? currentTime;
+  const max = duration || 1;
+  const pct = duration ? (shown / duration) * 100 : 0;
+  const bufPct = duration ? Math.min(100, (buffered / duration) * 100) : 0;
+  const commit = () => {
+    if (drag !== null) p.seek(drag);
+    setDrag(null);
+  };
+
   const slider = (
     <input
       type="range"
       className="range flex-1"
       min={0}
-      max={p.duration || 1}
+      max={max}
       step={0.1}
-      value={Math.min(p.currentTime, p.duration || 1)}
+      value={Math.min(shown, max)}
       disabled={!canPlay}
-      onChange={(e) => p.seek(Number(e.target.value))}
-      style={{ "--fill": `${pct}%` } as CSSProperties}
+      onChange={(e) => setDrag(Number(e.target.value))}
+      onPointerUp={commit}
+      onTouchEnd={commit}
+      onKeyUp={commit}
+      onBlur={commit}
+      style={{ "--fill": `${pct}%`, "--buffered": `${Math.max(pct, bufPct)}%` } as CSSProperties}
       aria-label="Seek"
-      aria-valuetext={`${fmtTime(p.currentTime)} of ${fmtTime(p.duration)}`}
+      aria-valuetext={`${fmtTime(shown)} of ${fmtTime(duration)}`}
     />
   );
   if (large) {
@@ -99,17 +115,28 @@ export function ProgressBar({ className, large }: { className?: string; large?: 
       <div className={className}>
         <div className="flex">{slider}</div>
         <div className="mt-1 flex justify-between text-xs tabular-nums text-muted">
-          <span>{fmtTime(p.currentTime)}</span>
-          <span>{fmtTime(p.duration)}</span>
+          <span>{fmtTime(shown)}</span>
+          <span>{fmtTime(duration)}</span>
         </div>
       </div>
     );
   }
   return (
     <div className={cn("flex items-center gap-2 text-[11px] tabular-nums text-subtle", className)}>
-      <span className="w-9 text-right">{fmtTime(p.currentTime)}</span>
+      <span className="w-9 text-right">{fmtTime(shown)}</span>
       {slider}
-      <span className="w-9">{fmtTime(p.duration)}</span>
+      <span className="w-9">{fmtTime(duration)}</span>
+    </div>
+  );
+}
+
+/** Thin progress line for the mobile mini player. */
+export function MiniProgress() {
+  const { currentTime, duration } = usePlayerTime();
+  const pct = duration ? (currentTime / duration) * 100 : 0;
+  return (
+    <div className="absolute inset-x-0 top-0 h-0.5 bg-line lg:hidden">
+      <div className="h-full bg-fg" style={{ width: `${pct}%` }} />
     </div>
   );
 }

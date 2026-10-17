@@ -25,6 +25,10 @@ export function PlayButton({
   return (
     <button
       type="button"
+      // Start buffering on press, ~100–300 ms before the click fires.
+      onPointerDown={() => !current && p.prime(track)}
+      // Desktop: hovering is a strong intent signal — start buffering early.
+      onPointerEnter={(e) => e.pointerType === "mouse" && !current && p.prime(track)}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

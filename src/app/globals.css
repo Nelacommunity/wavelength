@@ -77,12 +77,24 @@ input[type="range"].range {
 input[type="range"].range::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 999px;
-  background: linear-gradient(to right, var(--color-fg) var(--fill, 0%), #3a3a44 var(--fill, 0%));
+  background: linear-gradient(
+    to right,
+    var(--color-fg) var(--fill, 0%),
+    #5a5a66 var(--fill, 0%),
+    #5a5a66 var(--buffered, var(--fill, 0%)),
+    #34343d var(--buffered, var(--fill, 0%))
+  );
 }
 input[type="range"].range::-moz-range-track {
   height: 4px;
   border-radius: 999px;
-  background: linear-gradient(to right, var(--color-fg) var(--fill, 0%), #3a3a44 var(--fill, 0%));
+  background: linear-gradient(
+    to right,
+    var(--color-fg) var(--fill, 0%),
+    #5a5a66 var(--fill, 0%),
+    #5a5a66 var(--buffered, var(--fill, 0%)),
+    #34343d var(--buffered, var(--fill, 0%))
+  );
 }
 input[type="range"].range::-webkit-slider-thumb {
   appearance: none;

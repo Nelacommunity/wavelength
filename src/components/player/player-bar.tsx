@@ -1,10 +1,10 @@
 "use client";
 
-import { ExternalLink, Loader2, Maximize2, Music2, Pause, Play, SkipForward } from "lucide-react";
+import { CircleCheck, ExternalLink, Loader2, Maximize2, Music2, Pause, Play, SkipForward } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Artwork } from "@/components/ui/artwork";
 import { usePlayer } from "@/components/player/player-provider";
-import { ProgressBar, TransportControls, VolumeControl } from "@/components/player/controls";
+import { MiniProgress, ProgressBar, TransportControls, VolumeControl } from "@/components/player/controls";
 import { NowPlaying } from "@/components/player/now-playing";
 
 export function PlayerBar() {
@@ -13,7 +13,6 @@ export function PlayerBar() {
   const close = useCallback(() => setExpanded(false), []);
   const t = p.track;
   const canPlay = Boolean(t?.preview_url);
-  const pct = p.duration ? (p.currentTime / p.duration) * 100 : 0;
 
   if (!t) {
     return (
@@ -31,11 +30,7 @@ export function PlayerBar() {
       <NowPlaying open={expanded} onClose={close} />
       <div className="relative border-t border-line bg-surface/95 backdrop-blur" role="region" aria-label="Player">
         {/* Mobile progress line */}
-        {canPlay && (
-          <div className="absolute inset-x-0 top-0 h-0.5 bg-line lg:hidden">
-            <div className="h-full bg-fg" style={{ width: `${pct}%` }} />
-          </div>
-        )}
+        {canPlay && <MiniProgress />}
 
         {/* Mobile mini player: tap to expand */}
         <div className="flex h-16 items-center gap-3 px-3 lg:hidden">
@@ -73,7 +68,10 @@ export function PlayerBar() {
               </span>
             </button>
             <div className="min-w-0">
-              <div className="truncate text-sm font-semibold">{t.title}</div>
+              <div className="flex items-center gap-1.5">
+                <span className="truncate text-sm font-semibold">{t.title}</span>
+                {p.savedOffline && <CircleCheck className="h-3.5 w-3.5 shrink-0 text-up" aria-label="Saved on this device" />}
+              </div>
               <div className="truncate text-xs text-muted">
                 {t.artist}
                 {subtitle && <span className="text-subtle">{subtitle}</span>}

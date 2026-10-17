@@ -20,7 +20,8 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "Content-Type", value: "application/javascript; charset=utf-8" },
           { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
-          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'" },
+          // The worker caches cover art from Supabase/CDNs, so it must be able to fetch https: images.
+          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'; connect-src 'self' https:; img-src 'self' https: data:" },
         ],
       },
       {

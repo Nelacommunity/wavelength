@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { ChevronDown, ExternalLink, ListMusic } from "lucide-react";
+import { ChevronDown, CircleCheck, ExternalLink, ListMusic } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { usePlayer } from "@/components/player/player-provider";
 import { ProgressBar, TransportControls, VolumeControl } from "@/components/player/controls";
@@ -83,7 +83,17 @@ export function NowPlaying({ open, onClose }: { open: boolean; onClose: () => vo
             <ProgressBar large className="mt-5" />
             <TransportControls size="lg" className="mt-4" />
             <div className="mt-6 flex items-center justify-center gap-3 text-xs text-subtle">
-              {t.fullTrack ? "Uploaded on Wavelength" : t.preview_url ? "Preview" : "Audio unavailable"}
+              {p.savedOffline ? (
+                <span className="inline-flex items-center gap-1.5 text-up">
+                  <CircleCheck className="h-3.5 w-3.5" aria-hidden /> Saved on this device · plays instantly, even offline
+                </span>
+              ) : t.fullTrack ? (
+                "Uploaded on Wavelength"
+              ) : t.preview_url ? (
+                "Preview"
+              ) : (
+                "Audio unavailable"
+              )}
             </div>
             <VolumeControl className="mx-auto mt-4 hidden lg:flex" />
             {p.error && <p className="mt-3 text-center text-sm text-down">{p.error}</p>}

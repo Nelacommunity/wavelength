@@ -33,6 +33,14 @@ export function PlayAllButton({ className, size = "lg" }: { className?: string; 
     <button
       type="button"
       disabled={!playable}
+      onPointerDown={() => {
+        const first = scope.tracks.find((t) => t.preview_url);
+        if (!active && !p.shuffle && first) p.prime(first);
+      }}
+      onPointerEnter={(e) => {
+        const first = scope.tracks.find((t) => t.preview_url);
+        if (e.pointerType === "mouse" && !active && !p.shuffle && first) p.prime(first);
+      }}
       onClick={() => (active ? p.toggle() : p.playList(scope.tracks, scope.label))}
       aria-label={playing ? `Pause ${scope.label}` : `Play ${scope.label}`}
       className={cn(
